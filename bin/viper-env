@@ -13,5 +13,5 @@ use Symfony\Component\Console\Application;
 use Viper\Env\Console\Interfaces\CommandInterface;
 
 $app = new Application(CommandInterface::NAME, CommandInterface::VERSION);
-$app->add(new \Viper\Storage\Console\InitCommand);
+$app->add(new \Viper\Env\Console\SyncCommand);
 $app->run();
