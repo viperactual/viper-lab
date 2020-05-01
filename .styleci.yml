@@ -1,0 +1,4 @@
+php:
+  preset: viper-env
+js: true
+css: true

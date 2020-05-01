@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+define('BIN_BASE', __DIR__);
+
+if (file_exists(BIN_BASE . '/../../../autoload.php')) {
+    require BIN_BASE . '/../../../autoload.php';
+} else {
+    require BIN_BASE . '/../vendor/autoload.php';
+}
+
+use Symfony\Component\Console\Application;
+use Viper\Env\Console\Interfaces\CommandInterface;
+
+$app = new Application(CommandInterface::NAME, CommandInterface::VERSION);
+$app->add(new \Viper\Storage\Console\InitCommand);
+$app->run();
