@@ -16,6 +16,6 @@ namespace Viper\Env\Console\Interfaces;
 interface CommandInterface
 {
     const NAME = 'Viper Env CLI';
-    const VERSION = '0.1.0';
+    const VERSION = '1.0.0';
     const BASE_URI  = 'http://env.viper.services/';
 }
