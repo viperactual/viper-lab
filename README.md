@@ -20,4 +20,6 @@ composer global require viper/env
 
 ## Usage
 
-@todo
+```bash
+viper-env sync
+```
