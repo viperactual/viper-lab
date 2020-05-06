@@ -1,6 +1,6 @@
 {
   "name": "viper/env",
-  "description": "Automatically sync services between Viper framework and Docker.",
+  "description": "Sync your .env files from Viper Lab.",
   "keywords": [ "viper", "env", "sync" ],
   "license": "MIT",
   "authors": [

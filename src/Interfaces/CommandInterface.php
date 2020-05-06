@@ -1,12 +1,12 @@
 <?php
 
-namespace Viper\Env\Console\Interfaces;
+namespace Viper\ViperLab\Console\Interfaces;
 
 /**
- * Viper Env Command Interface Class.
+ * ViperLab Env Command Interface Class.
  *
- * @package      ViperEnv
- * @category     Base
+ * @package      ViperLab
+ * @category     Interfaces
  * @name         CommandInterface
  * @author       Michael Noël <mike@viperframe.work>
  * @copyright    (c) 2020 Viper framework
@@ -15,7 +15,8 @@ namespace Viper\Env\Console\Interfaces;
 
 interface CommandInterface
 {
-    const NAME = 'Viper Env CLI';
-    const VERSION = '1.0.0';
-    const BASE_URI  = 'http://env.viper.services/';
+    const APP_NAME = 'ViperLab CLI';
+    const APP_VERSION = '1.0.0';
+
+    const API_URL = 'https://viper-lab.com/api/v4/snippets/7/raw';
 }

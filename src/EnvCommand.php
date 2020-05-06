@@ -1,25 +1,26 @@
 <?php
 
-namespace Viper\Env\Console;
+namespace Viper\ViperLab\Console;
 
 use Symfony\Component\Process\Process;
+use Viper\ViperLab\Console\Support\Text;
 use Symfony\Component\Console\Command\Command;
-use Viper\Env\Console\Interfaces\CommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Viper\ViperLab\Console\Interfaces\CommandInterface;
 
 /**
- * Viper Env Sync Command Class.
+ * ViperLab Env Command Class.
  *
  * @package      ViperEnv
  * @category     Commands
- * @name         SyncCommand
+ * @name         EnvCommand
  * @author       Michael Noël <mike@viperframe.work>
  * @copyright    (c) 2020 Viper framework
  * @license      http://viperframe.work/license
  */
 
-class SyncCommand extends Command implements CommandInterface
+class EnvCommand extends Command implements CommandInterface
 {
     /**
      * @access protected
@@ -39,8 +40,15 @@ class SyncCommand extends Command implements CommandInterface
     protected function configure()
     {
         $this
-            ->setName('sync')
-            ->setDescription('Updates your .env file when Docker changes.');
+            ->setName('env')
+            ->setDescription('Sync your .env files from Viper Lab.')
+
+
+        ; // End Chain
+
+
+        var_dump(__METHOD__); die;
+
     }
 
     /**
@@ -57,42 +65,73 @@ class SyncCommand extends Command implements CommandInterface
 
         $output->writeln('<comment>Syncing...</comment>');
 
+
+        var_dump(__METHOD__); die;
+
+
+
+
+
+
+
+
         $app = $this->getPath('.env');
 
+
+
         $this->envFile('app', $app);
+
+
+
+
+
+
+
+
+
 
         $docker = $this->getPath('docker' . DIRECTORY_SEPARATOR . '.env');
 
         $this->envFile('docker', $docker);
 
-        if ($this->environments['docker'] != false) {
-            if (! $this->environments['app']) {
-                $output->writeln('<error>Error! Cannot find app .env file content.</error>');
-            } else {
-                $replacements = [
-                    'DB_HOST' => $this->dbHost(),
-                    'DB_PORT' => $this->dbPort(),
-                    'DB_DATABASE' => $this->dbDatabase(),
-                    'DB_USERNAME' => $this->dbUsername(),
-                    'DB_PASSWORD' => $this->dbPassword(),
-                ];
 
-                $content = file_get_contents($app);
 
-                $fp = fopen($app, 'w');
 
-                foreach ($replacements as $key => $value) {
-                    $content = preg_replace("/.*\b" . $key . "\b.*\n/ui", trim($value) . "\n", $content);
-                }
 
-                fwrite($fp, trim($content) . PHP_EOL);
-                fclose($fp);
-            }
+        //if ($this->environments['docker'] != false) {
+        //    if (! $this->environments['app']) {
+        //        $output->writeln('<error>Error! Cannot find app .env file content.</error>');
+        //    } else {
+        //        $replacements = [
+        //            'DB_HOST' => $this->dbHost(),
+        //            'DB_PORT' => $this->dbPort(),
+        //            'DB_DATABASE' => $this->dbDatabase(),
+        //            'DB_USERNAME' => $this->dbUsername(),
+        //            'DB_PASSWORD' => $this->dbPassword(),
+        //        ];
+        //
+        //        $content = file_get_contents($app);
+        //
+        //        $fp = fopen($app, 'w');
+        //
+        //        foreach ($replacements as $key => $value) {
+        //            $content = preg_replace("/.*\b" . $key . "\b.*\n/ui", trim($value) . "\n", $content);
+        //        }
+        //
+        //        fwrite($fp, trim($content) . PHP_EOL);
+        //        fclose($fp);
+        //    }
+        //
+        //    $output->writeln('<info>Changes made.</info>');
+        //} else {
+        //    $output->writeln('<error>Cannot find docker .env file, now what?</error>');
+        //}
 
-            $output->writeln('<info>Changes made.</info>');
-        } else {
-            $output->writeln('<error>Cannot find docker .env file, now what?</error>');
-        }
+
+
+
+
+
 
         $commands = [];
 

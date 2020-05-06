@@ -2,6 +2,10 @@
 
 ---
 
+## Introduction
+
+Sync your .env files files from Viper Lab.
+
 ## Install
 
 ### Composer
@@ -21,5 +25,9 @@ composer global require viper/env
 ## Usage
 
 ```bash
-viper-env sync
+viper-lab env
+
+
+
+
 ```
