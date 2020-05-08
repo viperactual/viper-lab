@@ -1,10 +1,10 @@
 {
-  "name": "viper/env",
-  "description": "Automatically sync services between Viper framework and Docker.",
-  "keywords": [ "viper", "env", "sync" ],
+  "name": "viper/lab",
+  "description": "Grab your environment files from ViperLab.",
+  "keywords": [ "viper", "viperlab", "env", "sync" ],
   "license": "MIT",
   "authors": [
-    { 
+    {
       "name": "Michael Noël",
       "email": "mike@viperframe.work"
     }
@@ -21,16 +21,19 @@
     "phpunit/phpunit": "^8.0"
   },
   "bin": [
-    "bin/viper-env"
+    "bin/viper-lab"
   ],
   "autoload": {
     "psr-4": {
-      "Viper\\Env\\Console\\": "src/"
-    }
+      "Viper\\ViperLab\\Console\\": "src/"
+    },
+    "files": [
+      "src/Support/helpers.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
-      "Viper\\Env\\Console\\Tests\\": "tests/"
+      "Viper\\ViperLab\\Console\\Tests\\": "tests/"
     }
   },
   "extra": {

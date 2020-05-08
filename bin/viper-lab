@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+
+define('BIN_BASE', __DIR__);
+
+if (file_exists(BIN_BASE . '/../../../autoload.php')) {
+    require BIN_BASE . '/../../../autoload.php';
+} else {
+    require BIN_BASE . '/../vendor/autoload.php';
+}
+
+use Viper\ViperLab\Console\EnvCommand;
+use Viper\ViperLab\Console\ViperCommand;
+use Viper\ViperLab\Console\DockerCommand;
+use Viper\ViperLab\Console\VagrantCommand;
+use Symfony\Component\Console\Application;
+
+$app = new Application(EnvCommand::APP_NAME, EnvCommand::APP_VERSION);
+
+$app->add(new ViperCommand);
+$app->add(new DockerCommand);
+$app->add(new VagrantCommand);
+
+$app->run();
