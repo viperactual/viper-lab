@@ -2,15 +2,19 @@
 
 namespace Viper\ViperLab\Console;
 
+use RuntimeException;
+use GuzzleHttp\Client;
 use Symfony\Component\Process\Process;
+use Viper\ViperLab\Console\Support\Url;
+use Viper\ViperLab\Console\Support\File;
 use Viper\ViperLab\Console\Support\Text;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Viper\ViperLab\Console\Interfaces\CommandInterface;
 
 /**
- * ViperLab Env Command Class.
+ * ViperLab Env Base Command Class.
  *
  * @package      ViperEnv
  * @category     Commands
@@ -20,15 +24,31 @@ use Viper\ViperLab\Console\Interfaces\CommandInterface;
  * @license      http://viperframe.work/license
  */
 
-class EnvCommand extends Command implements CommandInterface
+class EnvCommand extends Command
 {
+    const APP_NAME = 'ViperLab CLI';
+    const APP_VERSION = '1.0.0';
+    const API_BASE = 'https://viper-lab.com/api/v4';
+    const API_SNIPPETS_URL = '/snippets';
+    const API_SNIPPET_URL = '/snippets/{{ id }}/raw';
+
+    /**
+     * @static
+     * @access public
+     * @var    string $charset  Character set of input and output
+     */
+    public static $charset = 'utf-8';
+
     /**
      * @access protected
-     * @var    array $environments
+     * @var    array $file  File data
      */
-    protected $environments = [
-        'app' => false,
-        'docker' => false,
+    protected $file = [
+        'data' => [],
+        'id' => null,
+        'private_token' => null,
+        'path' => '.env',
+        'title' => null,
     ];
 
     /**
@@ -40,303 +60,186 @@ class EnvCommand extends Command implements CommandInterface
     protected function configure()
     {
         $this
-            ->setName('env')
-            ->setDescription('Sync your .env files from Viper Lab.')
-
-
-        ; // End Chain
-
-
-        var_dump(__METHOD__); die;
-
+            ->addOption('debug', null, InputOption::VALUE_NONE, 'Debug.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Dry run.')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists')
+            ->addOption('id', null, InputOption::VALUE_OPTIONAL, 'You must provide the ID for the file.')
+            ->addOption('private-token', 't', InputOption::VALUE_REQUIRED, 'Add your private token for ViperLab')
+            ->addOption('title', null, InputOption::VALUE_OPTIONAL, 'You must provide the title for the file.')
+            ->addOption('update', 'u', InputOption::VALUE_NONE, 'Update after install.');
     }
 
     /**
-     * Execute the command.
+     * Download and install the file from ViperLab.
      *
      * @access protected
-     * @param  \Symfony\Component\Console\Input\InputInterface   $input   User input
-     * @param  \Symfony\Component\Console\Output\OutputInterface $output  Output
-     * @return integer
+     * @param  \Symfony\Component\Console\Input\InputInterface $input 
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output 
+     * @return array
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function install(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Initializing, please wait...</info>');
 
-        $output->writeln('<comment>Syncing...</comment>');
-
-
-        var_dump(__METHOD__); die;
-
-
-
-
-
-
-
-
-        $app = $this->getPath('.env');
-
-
-
-        $this->envFile('app', $app);
-
-
-
-
-
-
-
-
-
-
-        $docker = $this->getPath('docker' . DIRECTORY_SEPARATOR . '.env');
-
-        $this->envFile('docker', $docker);
-
-
-
-
-
-        //if ($this->environments['docker'] != false) {
-        //    if (! $this->environments['app']) {
-        //        $output->writeln('<error>Error! Cannot find app .env file content.</error>');
-        //    } else {
-        //        $replacements = [
-        //            'DB_HOST' => $this->dbHost(),
-        //            'DB_PORT' => $this->dbPort(),
-        //            'DB_DATABASE' => $this->dbDatabase(),
-        //            'DB_USERNAME' => $this->dbUsername(),
-        //            'DB_PASSWORD' => $this->dbPassword(),
-        //        ];
-        //
-        //        $content = file_get_contents($app);
-        //
-        //        $fp = fopen($app, 'w');
-        //
-        //        foreach ($replacements as $key => $value) {
-        //            $content = preg_replace("/.*\b" . $key . "\b.*\n/ui", trim($value) . "\n", $content);
-        //        }
-        //
-        //        fwrite($fp, trim($content) . PHP_EOL);
-        //        fclose($fp);
-        //    }
-        //
-        //    $output->writeln('<info>Changes made.</info>');
-        //} else {
-        //    $output->writeln('<error>Cannot find docker .env file, now what?</error>');
-        //}
-
-
-
-
-
-
-
-        $commands = [];
-
-        if ($input->getOption('no-ansi')) {
-            $commands = array_map(function ($value) {
-                return $value . ' --no-ansi';
-            }, $commands);
+        if (File::exists($this->file['path'])) {
+            if (! $input->getOption('force')) {
+                throw new RuntimeException('The file already exists!');
+            }
         }
 
-        if ($input->getOption('quiet')) {
-            $commands = array_map(function ($value) {
-                return $value . ' --quiet';
-            }, $commands);
+        $this->get($input, $output);
+
+        return [];
+    }
+
+    /**
+     * GET request to download the file from ViperLab.
+     *
+     * @access protected
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input 
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output 
+     * @throws RuntimeException 
+     * @return EnvCommand
+     */
+    protected function get(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<comment>Downloading...</comment>');
+
+        $options = [];
+
+        if ($this->file['private_token'] != null) {
+            $options = [
+                'headers' => [
+                    'PRIVATE-TOKEN' => $this->file['private_token'],
+                ],
+            ];
         }
 
-        $process = Process::fromShellCommandline(implode(' && ', $commands), $this->getPath(), null, null, null);
-
-        $process->run(function ($type, $line) use ($output) {
-            $output->write($line);
-        });
-
-        if ($process->isSuccessful()) {
-            $output->writeln('<info>Sync completed!</info>');
+        if ($this->file['id'] != null) {
+            $this->getById($input, $output, $options);
+        } else {
+            $this->getByTitle($input, $output, $options);
         }
 
-        return 0;
+        return $this;
     }
 
     /**
-     * Get docker container ip for database.
+     * Get by ID.
      *
      * @access protected
-     * @return string
+     * @param  InputInterface $input 
+     * @param  OutputInterface $output
+     * @param  array $options
+     * @throws RuntimeException 
+     * @return EnvCommand
      */
-    protected function dockerContainerIp()
+    protected function getById(InputInterface $input, OutputInterface $output, $options)
     {
-        $debug = false;
+        $raw_url = Text::braces(Url::api(static::API_SNIPPET_URL), [
+            'id' => $this->file['id'],
+        ]);
 
-        if ($debug) {
-            return '172.19.0.2';
+        if ($input->getOption('dry-run') && ! $input->getOption('force')) {
+            $output->writeln('<comment>Calling...</comment>');
+            $output->writeln('<comment> * ' . $raw_url .'</comment>');
+        } else {
+            $response = (new Client)->get($raw_url, $options);
+
+            if (! file_put_contents($this->file['path'], $response->getBody())) {
+                throw new RuntimeException('Error: Cannot write to file!');
+            }
         }
 
-        $container_name = $this->environments['app']['DOCKER_CONTAINER_PREFIX'] . '_mysql_1';
-
-        $container_id = $this->execCommand('docker ps -aqf "name=' . $container_name . '"');
-
-        $container_ip = $this->execCommand("docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' {$container_id}");
-
-        return $container_ip;
+        return $this;
     }
 
     /**
-     * Ping the Docker container for its IP address.
+     * Get by title.
      *
      * @access protected
-     * @return string
+     * @param  InputInterface  $input 
+     * @param  OutputInterface $output
+     * @param  array           $options
+     * @throws RuntimeException 
+     * @return EnvCommand
      */
-    protected function dbHost()
+    protected function getByTitle(InputInterface $input, OutputInterface $output, $options)
     {
-        return sprintf('DB_HOST=%s', $this->dockerContainerIp());
+        if ($input->getOption('dry-run') && ! $input->getOption('force')) {
+            $output->writeln('<comment>Calling...</comment>');
+            $output->writeln('<comment> * ' . Url::api(static::API_SNIPPETS_URL) . '</comment>');
+        } else {
+            $first = (new Client)->get(Url::api(static::API_SNIPPETS_URL), $options);
+
+            $snippets = json_decode($first->getBody()->getContents(), true);
+
+            foreach ($snippets as $snippet) {
+                if ($this->file['title'] == $snippet['title']) {
+                    $raw_url = Text::braces(Url::api(static::API_SNIPPET_URL), [
+                        'id' => $snippet['id'],
+                    ]);
+
+                    $second = (new Client)->get($raw_url, $options);
+
+                    if (! file_put_contents($this->file['path'], $second->getBody()->getContents())) {
+                        throw new RuntimeException('Error: Cannot write to file!');
+                    }
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * Get the database user name.
+     * Will run commands sent to it.
      *
      * @access protected
-     * @return mixed
-     */
-    protected function dbUsername()
-    {
-        $username = function () {
-            return (! empty($this->environments['app']['DB_USERNAME']))
-                ? $this->environments['app']['DB_USERNAME']
-                : $this->environments['docker']['MYSQL_USER'];
-        };
-
-        return sprintf('DB_USERNAME=%s', $username());
-    }
-
-    /**
-     * Get the database password.
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function dbPassword()
-    {
-        $password = function () {
-            return (! empty($this->environments['app']['DB_PASSWORD']))
-                ? $this->environments['app']['DB_PASSWORD']
-                : $this->environments['docker']['MYSQL_PASSWORD'];
-        };
-
-        return sprintf('DB_PASSWORD=%s', $password());
-    }
-
-    /**
-     * Get the database name.
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function dbDatabase()
-    {
-        $database = function () {
-            return (! empty($this->environments['app']['DB_DATABASE']))
-                ? $this->environments['app']['DB_DATABASE']
-                : $this->environments['docker']['MYSQL_DATABASE'];
-        };
-
-        return sprintf('DB_DATABASE="%s"', $database());
-    }
-
-    /**
-     * Setting the database port.
-     *
-     * @access protected
-     * @return mixed
-     */
-    protected function dbPort()
-    {
-        $port = function () {
-            return (! empty($this->environments['app']['DB_PORT']))
-                ? $this->environments['app']['DB_PORT']
-                : $this->environments['docker']['MYSQL_PORT'];
-        };
-
-        return sprintf('DB_PORT=%s', $port());
-    }
-
-    /**
-     * Get path.
-     *
-     * @access protected
-     * @param  mixed $extension 
-     * @return string
-     */
-    protected function getPath($extension = '')
-    {
-        return getcwd() . DIRECTORY_SEPARATOR . $extension;
-    }
-
-    /**
-     * Env file.
-     *
-     * @access private
-     * @param  mixed $alias 
-     * @param  mixed $path
+     * @param  mixed $commands 
+     * @param  mixed $input
      * @return void
      */
-    private function envFile($alias, $path)
+    protected function commands($commands = [], $input)
     {
-        if (file_exists($path)) {
-            $this->environments[$alias] = $this->parse($path);
+        if (! empty($commands)) {
+            if ($input->getOption('no-ansi')) {
+                $commands = array_map(function ($value) {
+                    return $value . ' --no-ansi';
+                }, $commands);
+            }
+
+            if ($input->getOption('quiet')) {
+                $commands = array_map(function ($value) {
+                    return $value . ' --quiet';
+                }, $commands);
+            }
+
+            $process = Process::fromShellCommandline(implode(' && ', $commands), $this->getPath(), null, null, null);
+
+            if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
+                $process->setTty(true);
+            }
+
+            $process->run(function ($type, $line) use ($output) {
+                $output->write($line);
+            });
+
+            if ($process->isSuccessful()) {
+                $output->writeln('<comment>Success!</comment>');
+            }
         }
     }
 
     /**
      * Execute command.
      *
-     * @access private
+     * @access protected
      * @param  mixed $command  Command to execute
      * @return string
      */
-    private function execCommand($command)
+    protected function execCommand($command)
     {
         return shell_exec($command);
-    }
-
-    /**
-     * Parse an environment file into an array.
-     *
-     * @access private
-     * @param  string $env  Environment file to parse
-     * @return array
-     */
-    private function parse(string $env)
-    {
-        $array = [];
-
-        $file = fopen($env, 'r') or exit('Unable to open file!');
-
-        while (! feof($file)) {
-            $line = fgets($file);
-
-            if ($line == "\n") {
-                continue;
-            }
-
-            if (strpos($line, '#') === 0) {
-                continue;
-            }
-
-            $data = explode('=', trim($line));
-
-            if (! empty($data[0])) {
-                $key = $data[0];
-                $val = $data[1];
-
-                $array[$key] = isset($val) ? str_replace('"', '', $val) : '';
-            }
-        }
-
-        fclose($file);
-
-        return $array;
     }
 }
