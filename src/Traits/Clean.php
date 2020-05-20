@@ -3,7 +3,7 @@
 namespace Viper\ViperLab\Console\Traits;
 
 use Dotenv\Dotenv;
-use Viper\ViperLab\Support\Env;
+use Viper\ViperLab\Console\Support\Env;
 
 /**
  * ViperLab Clean Concern Trait.
@@ -20,18 +20,17 @@ trait Clean
 {
     protected function finalize($path)
     {
-        $content = '';
-
         $variables = Dotenv::create($path, '.env', Env::getFactory())->safeLoad();
 
+        $content = '';
+
         foreach ($variables as $var => $val) {
-            $content .= sprintf('%s=%s', $var, $val);
+            $content .= sprintf('%s=%s', $var, $val) . PHP_EOL;
         }
 
-        $fp = fopen($path . '/.env', 'w');
+        $handler = fopen($path . '/.env', 'w');
 
-        fwrite($fp, $content . PHP_EOL);
-
-        fclose($fp);
+        fwrite($handler, $content . PHP_EOL);
+        fclose($handler);
     }
 }
