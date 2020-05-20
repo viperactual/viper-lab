@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ViperCommand extends EnvCommand 
 {
+    use Traits\Clean;
+
     /**
      * Configure the command options.
      *
@@ -55,6 +57,8 @@ class ViperCommand extends EnvCommand
         if ($input->getOption('update') ?? false) {
             $this->update($input, $output);
         }
+
+        $this->finalize($this->file['path']);
 
         $output->writeln('<info>Done!</info>');
 

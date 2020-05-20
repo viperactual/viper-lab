@@ -27,7 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class EnvCommand extends Command
 {
     const APP_NAME = 'ViperLab CLI';
-    const APP_VERSION = '1.0.3';
+    const APP_VERSION = '1.0.4';
     const API_BASE = 'https://viper-lab.com/api/v4';
     const API_SNIPPETS_URL = '/snippets';
     const API_SNIPPET_URL = '/snippets/{{ id }}/raw';
