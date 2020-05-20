@@ -28,7 +28,7 @@ trait Clean
             $content .= sprintf('%s=%s', $var, $val) . PHP_EOL;
         }
 
-        $handler = fopen($path . '/.env', 'w');
+        $handler = fopen($path, 'w');
 
         fwrite($handler, $content . PHP_EOL);
         fclose($handler);
