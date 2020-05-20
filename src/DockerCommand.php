@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DockerCommand extends EnvCommand 
 {
+    use Traits\Clean;
+
     /**
      * Configure the command options.
      *
@@ -39,8 +41,8 @@ class DockerCommand extends EnvCommand
      * Execute the command.
      *
      * @access protected
-     * @param  \Symfony\Component\Console\Input\InputInterface   $input   User input
-     * @param  \Symfony\Component\Console\Output\OutputInterface $output  Output
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
      * @return integer
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -55,6 +57,8 @@ class DockerCommand extends EnvCommand
         if ($input->getOption('update') ?? false) {
             $this->update($input, $output);
         }
+
+        $this->finalize($this->file['path']);
 
         $output->writeln('<info>Done!</info>');
 
