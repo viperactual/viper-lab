@@ -58,7 +58,9 @@ class ViperCommand extends EnvCommand
             $this->update($input, $output);
         }
 
-        $this->finalize($this->file['path']);
+        if ($input->getOption('minify') ?? false) {
+            $this->finalize($this->file['path']);
+        }
 
         $output->writeln('<info>Done!</info>');
 
