@@ -62,7 +62,7 @@ class EnvCommand extends Command
         $this
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Debug.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Dry run.')
-            ->addOption('minify', 'm', InputOption::VALUE_NONE, 'descr')
+            ->addOption('minify', 'm', InputOption::VALUE_NONE, 'Remove comments and whitespaces')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists')
             ->addOption('id', null, InputOption::VALUE_OPTIONAL, 'You must provide the ID for the file.')
             ->addOption('private-token', 't', InputOption::VALUE_REQUIRED, 'Add your private token for ViperLab')
