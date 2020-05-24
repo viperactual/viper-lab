@@ -26,11 +26,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EnvCommand extends Command
 {
-    const APP_NAME = 'ViperLab CLI';
-    const APP_VERSION = '1.0.7';
-    const API_BASE = 'https://viper-lab.com/api/v4';
+    const APP_NAME         = 'ViperLab CLI';
+    const APP_VERSION      = '1.0.8';
+    const API_BASE         = 'https://viper-lab.com/api/v4';
+    const API_SNIPPET_URL  = '/snippets/{{ id }}/raw';
     const API_SNIPPETS_URL = '/snippets';
-    const API_SNIPPET_URL = '/snippets/{{ id }}/raw';
 
     /**
      * @static
@@ -62,6 +62,7 @@ class EnvCommand extends Command
         $this
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Debug.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Dry run.')
+            ->addOption('conf', 'c', InputOption::VALUE_OPTIONAL, 'Nginx conf file name')
             ->addOption('minify', 'm', InputOption::VALUE_NONE, 'Remove comments and whitespaces')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists')
             ->addOption('id', null, InputOption::VALUE_OPTIONAL, 'You must provide the ID for the file.')
