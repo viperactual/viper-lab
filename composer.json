@@ -1,7 +1,7 @@
 {
   "name": "viper/lab",
   "description": "Grab your environment files from ViperLab.",
-  "keywords": [ "viper", "viperlab", "env", "sync" ],
+  "keywords": [ "viper", "viperlab", "env", "sync", "config" ],
   "license": "MIT",
   "authors": [
     {
