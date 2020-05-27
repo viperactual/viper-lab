@@ -2,8 +2,6 @@
 
 namespace Viper\ViperLab\Console\Support;
 
-use Viper\ViperLab\Console\EnvCommand;
-
 /**
  * ViperLab Url Support Class.
  *
@@ -26,6 +24,6 @@ class Url
      */
     public static function api($uri)
     {
-        return EnvCommand::API_BASE . $uri;
+        return \Viper\ViperLab\Console\SnippetCommand::API_URL . $uri;
     }
 }

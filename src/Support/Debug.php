@@ -4,7 +4,7 @@ namespace Viper\ViperLab\Console\Support;
 
 use ReflectionMethod;
 use ReflectionFunction;
-use Viper\ViperLab\Console\EnvCommand;
+use Viper\ViperLab\Console\SnippetCommand;
 
 /**
  * ViperLab Debug Support Class.
@@ -103,7 +103,7 @@ class Debug
                         }
                     }
 
-                    return '<small>resource</small><span>(' . $type . ')</span> ' . htmlspecialchars($file, ENT_NOQUOTES, EnvCommand::$charset);
+                    return '<small>resource</small><span>(' . $type . ')</span> ' . htmlspecialchars($file, ENT_NOQUOTES, SnippetCommand::$charset);
                 }
             } else {
                 return '<small>resource</small><span>(' . $type . ')</span>';
@@ -114,14 +114,14 @@ class Debug
             // Clean invalid multibyte characters. iconv is only invoked
             // if there are non ASCII characters in the string, so this
             // isn't too much of a hit.
-            $var = Utf8::clean($var, EnvCommand::$charset);
+            $var = Utf8::clean($var, SnippetCommand::$charset);
 
             if (Utf8::strLen($var) > $length) {
                 // Encode the truncated string.
-                $str = htmlspecialchars(Utf8::subStr($var, 0, $length), ENT_NOQUOTES, EnvCommand::$charset) . '&nbsp;&hellip;';
+                $str = htmlspecialchars(Utf8::subStr($var, 0, $length), ENT_NOQUOTES, SnippetCommand::$charset) . '&nbsp;&hellip;';
             } else {
                 // Encode the string.
-                $str = htmlspecialchars($var, ENT_NOQUOTES, EnvCommand::$charset);
+                $str = htmlspecialchars($var, ENT_NOQUOTES, SnippetCommand::$charset);
             }
 
             return '<small>string</small><span>(' . strlen($var) . ')</span> "' . $str . '"';
@@ -152,7 +152,7 @@ class Debug
                         continue;
                     }
                     if (! is_int($key)) {
-                        $key = '"' . htmlspecialchars($key, ENT_NOQUOTES, EnvCommand::$charset) . '"';
+                        $key = '"' . htmlspecialchars($key, ENT_NOQUOTES, SnippetCommand::$charset) . '"';
                     }
 
                     $output[] = "$space$s$key => ".Debug::_dump($val, $length, $limit, $level + 1);
@@ -216,7 +216,7 @@ class Debug
 
             return '<small>object</small> <span>' . get_class($var) . '(' . count($array) . ')</span> ' . implode("\n", $output);
         } else {
-            return '<small>' . gettype($var) . '</small> ' . htmlspecialchars(print_r($var, true), ENT_NOQUOTES, EnvCommand::$charset);
+            return '<small>' . gettype($var) . '</small> ' . htmlspecialchars(print_r($var, true), ENT_NOQUOTES, SnippetCommand::$charset);
         }
     }
 
@@ -289,7 +289,7 @@ class Debug
 
             if ($line >= $range['start']) {
                 // Make the row safe for output.
-                $row = htmlspecialchars($row, ENT_NOQUOTES, EnvCommand::$charset);
+                $row = htmlspecialchars($row, ENT_NOQUOTES, SnippetCommand::$charset);
 
                 // Trim whitespace and sanitize the row.
                 $row = '<span class="number">' . sprintf($format, $line) . '</span> ' . $row;

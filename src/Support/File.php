@@ -29,6 +29,19 @@ class File
     }
 
     /**
+     * Delete a file.
+     *
+     * @static
+     * @access public
+     * @param  string $file 
+     * @return bool
+     */
+    public static function delete(string $file = '')
+    {
+        return unlink($file);
+    }
+
+    /**
      * Checks to see if the file exists or not.
      *
      * @static
