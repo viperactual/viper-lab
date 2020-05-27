@@ -3,7 +3,7 @@
 namespace Viper\ViperLab\Console\Support;
 
 use \RuntimeException;
-use Viper\ViperLab\Console\EnvCommand;
+use Viper\ViperLab\Console\SnippetCommand;
 
 /**
  * ViperLab Utf8 Support Class.
@@ -46,14 +46,14 @@ class Utf8
      * @static
      * @access public
      * @param  mixed  $var      Variable to clean
-     * @param  string $charset  Character set, defaults to EnvCommand::$charset
+     * @param  string $charset  Character set, defaults to SnippetCommand::$charset
      * @return mixed
      */
     public static function clean($var, $charset = null)
     {
         if (! $charset) {
             // Use the application character set.
-            $charset = EnvCommand::$charset;
+            $charset = SnippetCommand::$charset;
         }
 
         if (is_array($var) || is_object($var)) {
@@ -232,7 +232,7 @@ class Utf8
     public static function strLen($str)
     {
         if (Utf8::$server_utf8) {
-            return mb_strlen($str, EnvCommand::$charset);
+            return mb_strlen($str, SnippetCommand::$charset);
         }
 
         if (Utf8::isAscii($str)) {
@@ -261,7 +261,7 @@ class Utf8
     public static function strPos($str, $search, $offset = 0)
     {
         if (Utf8::$server_utf8) {
-            return mb_strpos($str, $search, $offset, EnvCommand::$charset);
+            return mb_strpos($str, $search, $offset, SnippetCommand::$charset);
         }
 
         $offset = (int) $offset;
@@ -301,7 +301,7 @@ class Utf8
     public static function strRPos($str, $search, $offset = 0)
     {
         if (Utf8::$server_utf8) {
-            return mb_strrpos($str, $search, $offset, EnvCommand::$charset);
+            return mb_strrpos($str, $search, $offset, SnippetCommand::$charset);
         }
 
         $offset = (int) $offset;
@@ -341,8 +341,8 @@ class Utf8
     {
         if (Utf8::$server_utf8) {
             return ($length === null)
-                ? mb_substr($str, $offset, mb_strlen($str), EnvCommand::$charset)
-                : mb_substr($str, $offset, $length, EnvCommand::$charset);
+                ? mb_substr($str, $offset, mb_strlen($str), SnippetCommand::$charset)
+                : mb_substr($str, $offset, $length, SnippetCommand::$charset);
         }
 
         if (Utf8::isAscii($str)) {
@@ -459,7 +459,7 @@ class Utf8
     public static function strToLower($str)
     {
         if (Utf8::$server_utf8) {
-            return mb_strtolower($str, EnvCommand::$charset);
+            return mb_strtolower($str, SnippetCommand::$charset);
         }
 
         if (Utf8::isAscii($str)) {
@@ -543,7 +543,7 @@ class Utf8
     public static function strToUpper($str)
     {
         if (Utf8::$server_utf8) {
-            return mb_strtoupper($str, EnvCommand::$charset);
+            return mb_strtoupper($str, SnippetCommand::$charset);
         }
 
         if (Utf8::isAscii($str)) {

@@ -9,18 +9,9 @@ if (file_exists(BIN_BASE . '/../../../autoload.php')) {
     require BIN_BASE . '/../vendor/autoload.php';
 }
 
-use Viper\ViperLab\Console\EnvCommand;
-use Viper\ViperLab\Console\NginxCommand;
-use Viper\ViperLab\Console\ViperCommand;
-use Viper\ViperLab\Console\DockerCommand;
-use Viper\ViperLab\Console\VagrantCommand;
+use Viper\ViperLab\Console\SnippetCommand;
 use Symfony\Component\Console\Application;
 
-$app = new Application(EnvCommand::APP_NAME, EnvCommand::APP_VERSION);
-
-$app->add(new ViperCommand);
-$app->add(new NginxCommand);
-$app->add(new DockerCommand);
-$app->add(new VagrantCommand);
-
+$app = new Application('ViperLab CLI', '1.1.0');
+$app->add(new SnippetCommand);
 $app->run();

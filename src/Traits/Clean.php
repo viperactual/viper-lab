@@ -6,7 +6,7 @@ use Dotenv\Dotenv;
 use Viper\ViperLab\Console\Support\Env;
 
 /**
- * ViperLab Clean Concern Trait.
+ * ViperLab Clean Trait.
  *
  * @package      ViperEnv
  * @category     Traits
