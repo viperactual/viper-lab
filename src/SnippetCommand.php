@@ -48,7 +48,6 @@ class SnippetCommand extends Command
         $this
             ->setName('snippet')
             ->setDescription('Grab your snippet files from ViperLab.')
-            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Nginx config file name')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Debug.')
             ->addOption('private-token', 't', InputOption::VALUE_REQUIRED, 'Add your private token for ViperLab')
             ->addOption('title', null, InputOption::VALUE_REQUIRED, 'You must provide the title for the file.')
