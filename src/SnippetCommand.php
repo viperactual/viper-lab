@@ -50,7 +50,7 @@ class SnippetCommand extends Command
             ->setDescription('Grab your snippet files from ViperLab.')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Debug.')
             ->addOption('private-token', 't', InputOption::VALUE_REQUIRED, 'Add your private token for ViperLab')
-            ->addOption('title', null, InputOption::VALUE_REQUIRED, 'You must provide the title for the file.')
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'You must provide the Snippet ID for the file.')
             ->addOption('update', 'u', InputOption::VALUE_NONE, 'Update after install.');
     }
 
@@ -68,12 +68,12 @@ class SnippetCommand extends Command
     {
         $output->writeln('<info>Initializing, please wait...</info>');
 
-        if ($input->getOption('title') == null) {
-            throw new RuntimeException('Snippet title is required!');
+        if ($input->getOption('id') == null) {
+            throw new RuntimeException('Snippet ID is required!');
         }
 
         if ($input->getOption('private-token') == null) {
-            throw new RuntimeException('Snippet title is required!');
+            throw new RuntimeException('User private token is required!');
         }
 
         $options = [
@@ -83,51 +83,35 @@ class SnippetCommand extends Command
             ],
         ];
 
-        $first = (new Client)->get(Url::api('/snippets'), $options);
+        $raw_url = Text::braces(Url::api('/snippets/{{ id }}'), [
+            'id' => $input->getOption('id'),
+        ]);
 
-        $snippets = json_decode($first->getBody()->getContents(), true);
+        $response = (new Client)->get($raw_url, $options);
 
-        if (empty($snippets)) {
-            throw new RuntimeException('Project does not contain any snippets.');
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        $file = File::path($data['file_name']);
+
+        $file_path = dirname($file);
+        $file_name = basename($file);
+
+        if (File::exists($file) && File::delete($file)) {
+            $output->writeln('<comment>Deleted previous file...</comment>');                    
         }
 
-        $created = [];
+        $output->writeln('<info>Downloading...</info>');
 
-        foreach ($snippets as $snippet) {
-            if ($input->getOption('title') == $snippet['title']) {
-                $file = File::path($snippet['file_name']);
+        $second = (new Client)->get($data['raw_url'], $options);
 
-                $file_path = dirname($file);
-                $file_name = basename($file);
-
-                if (File::exists($file) && File::delete($file)) {
-                    $output->writeln('<comment>Deleted previous file...</comment>');                    
-                }
-
-                $output->writeln('<info>Downloading...</info>');
-
-                $raw_url = Text::braces(Url::api('/snippets/{{ id }}/raw'), [
-                    'id' => $snippet['id'],
-                ]);
-
-                $second = (new Client)->get($raw_url, $options);
-
-                if (! is_dir($file_path)) {
-                    mkdir($file_path, 0777, true);
-                }
-
-                $file = $file_path . DIRECTORY_SEPARATOR . $file_name;
-
-                if (! file_put_contents($file, $second->getBody()->getContents(), FILE_APPEND | LOCK_EX)) {
-                    throw new RuntimeException('Cannot write to file!');
-                } else {
-                    $created[] = $file;
-                }
-            }
+        if (! is_dir($file_path)) {
+            mkdir($file_path, 0777, true);
         }
 
-        if (empty($created)) {
-            $output->writeln('<comment>Not found! ' . $input->getOption('title') . '</comment>');
+        $file = $file_path . DIRECTORY_SEPARATOR . $file_name;
+
+        if (! file_put_contents($file, $second->getBody()->getContents(), FILE_APPEND | LOCK_EX)) {
+            throw new RuntimeException('Cannot write to file!');
         }
 
         $commands = [];

@@ -12,6 +12,6 @@ if (file_exists(BIN_BASE . '/../../../autoload.php')) {
 use Viper\ViperLab\Console\SnippetCommand;
 use Symfony\Component\Console\Application;
 
-$app = new Application('ViperLab CLI', '1.1.1');
+$app = new Application('ViperLab CLI', '1.2.0');
 $app->add(new SnippetCommand);
 $app->run();
