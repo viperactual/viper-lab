@@ -236,7 +236,7 @@ class Debug
      */
     public static function path($file)
     {
-        if (strpos($file, APP_PATH) === 0) {
+        if (strpos($file, BIN_BASE) === 0) {
             $file = 'BIN_BASE' . DIRECTORY_SEPARATOR . substr($file, strlen(BIN_BASE));
         }
 
